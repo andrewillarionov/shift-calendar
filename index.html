@@ -10,94 +10,112 @@
   :root {
     --day-bg: #FFF3C4;
     --day-fg: #7A5A00;
-    --day-accent: #F5B800;
+    --day-icon: #F5B800;
     --night-bg: #D6E4FF;
     --night-fg: #1E3A8A;
-    --night-accent: #3B5BDB;
+    --night-icon: #3B5BDB;
     --off-bg: #FFD9DE;
     --off-fg: #8B1F2F;
-    --off-accent: #E5484D;
-    --other-month: #F2F2F2;
-    --other-text: #B8B8B8;
+    --off-icon: #E5484D;
+    --other-bg: #F0F0F0;
+    --other-fg: #BDBDBD;
     --today-ring: #111;
     --bg: #FAFAFA;
     --card: #FFFFFF;
     --text: #1A1A1A;
-    --muted: #777;
-    --border: #E8E8E8;
+    --muted: #888;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   html, body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     background: var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-    font-size: 16px;
   }
 
   .app {
     max-width: 720px;
     margin: 0 auto;
-    padding: 12px 10px 40px;
+    padding: 10px 8px 24px;
   }
 
   /* Заголовок */
-  .header {
-    text-align: center;
-    padding: 8px 0 4px;
-  }
+  .header { text-align: center; padding: 4px 0 2px; }
   .header h1 {
     margin: 0;
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 800;
     letter-spacing: -0.5px;
-    text-transform: capitalize;
   }
   .header .sub {
     color: var(--muted);
-    font-size: 13px;
+    font-size: 12px;
     margin-top: 2px;
   }
+
+  /* Селекторы месяц/год */
+  .selectors {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 8px;
+  }
+  .selectors select {
+    flex: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    background: var(--card);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 34px;
+    text-align: center;
+    text-align-last: center;
+  }
+  .selectors select:focus { outline: 2px solid #111; }
 
   /* Навигация */
   .nav {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 8px;
-    margin: 14px 0 10px;
+    margin: 0 0 10px;
   }
   .nav button {
     border: none;
     background: var(--card);
     color: var(--text);
     border-radius: 12px;
-    padding: 10px 14px;
-    font-size: 15px;
-    font-weight: 600;
+    padding: 12px 0;
+    font-size: 16px;
+    font-weight: 700;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     cursor: pointer;
+    font-family: inherit;
     transition: transform .08s ease;
   }
   .nav button:active { transform: scale(0.95); }
+  .nav .arrow { flex: 1; }
   .nav .today-btn {
+    flex: 1.4;
     background: #111;
     color: #fff;
-    flex: 0 0 auto;
-  }
-  .nav .arrow {
-    flex: 1;
-    font-size: 18px;
   }
 
   /* Календарь */
   .calendar {
     background: var(--card);
-    border-radius: 18px;
-    padding: 8px;
+    border-radius: 16px;
+    padding: 6px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   }
 
@@ -114,7 +132,6 @@
     color: var(--muted);
     padding: 6px 0;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
   }
   .weekdays div.we { color: #C2410C; }
 
@@ -127,100 +144,57 @@
   .cell {
     position: relative;
     border-radius: 12px;
-    min-height: 74px;
-    padding: 6px 4px 4px;
+    aspect-ratio: 1 / 1.05;
+    padding: 4px 2px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     overflow: hidden;
-    cursor: default;
     user-select: none;
+    cursor: pointer;
   }
 
-  .cell.other { background: var(--other-month); color: var(--other-text); }
+  /* Базовые цвета смен */
+  .cell.day    { background: var(--day-bg);   color: var(--day-fg); }
+  .cell.night  { background: var(--night-bg); color: var(--night-fg); }
+  .cell.off    { background: var(--off-bg);   color: var(--off-fg); }
+
+  /* Соседние месяцы — В КОНЦЕ, чтобы переопределяли */
+  .cell.other {
+    background: var(--other-bg) !important;
+    color: var(--other-fg) !important;
+  }
 
   .cell .num {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 800;
     line-height: 1;
     margin-top: 2px;
   }
 
-  .cell .label {
-    font-size: 8.5px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.2px;
-    margin-top: 3px;
-    text-align: center;
-    line-height: 1.15;
+  .cell .icon {
+    font-size: 18px;
+    line-height: 1;
   }
 
   .cell .time {
     font-size: 9px;
-    font-weight: 600;
-    margin-top: 2px;
-    opacity: 0.85;
-    text-align: center;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.2px;
+    margin-bottom: 1px;
   }
-
-  .cell .icon {
-    font-size: 16px;
-    margin-top: auto;
-    margin-bottom: 2px;
-    line-height: 1;
-  }
-
-  .cell.day    { background: var(--day-bg);   color: var(--day-fg); }
-  .cell.night  { background: var(--night-bg); color: var(--night-fg); }
-  .cell.off    { background: var(--off-bg);   color: var(--off-fg); }
 
   .cell.today {
     box-shadow: inset 0 0 0 2.5px var(--today-ring);
   }
 
-  /* Легенда */
-  .legend {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 12px;
-    margin-top: 14px;
-    padding: 12px 14px;
-    background: var(--card);
-    border-radius: 14px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    font-size: 12px;
-  }
-  .legend .item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .legend .swatch {
-    width: 22px;
-    height: 22px;
-    border-radius: 7px;
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-  }
-  .legend .swatch.day   { background: var(--day-bg);   color: var(--day-accent); }
-  .legend .swatch.night { background: var(--night-bg); color: var(--night-accent); }
-  .legend .swatch.off   { background: var(--off-bg);   color: var(--off-accent); }
-  .legend .swatch.today { background: #fff; box-shadow: inset 0 0 0 2px #111; }
-
-  .legend .txt b { display: block; font-size: 12.5px; }
-  .legend .txt span { color: var(--muted); font-size: 11px; }
-
-  @media (max-width: 380px) {
-    .cell { min-height: 66px; border-radius: 10px; }
+  /* Уменьшение для узких экранов */
+  @media (max-width: 400px) {
     .cell .num { font-size: 14px; }
-    .cell .label { font-size: 7.5px; }
-    .cell .time { font-size: 8px; }
-    .cell .icon { font-size: 14px; }
+    .cell .icon { font-size: 16px; }
+    .cell .time { font-size: 8.5px; }
     .header h1 { font-size: 22px; }
   }
 </style>
@@ -230,6 +204,11 @@
   <div class="header">
     <h1 id="monthTitle">—</h1>
     <div class="sub">График смен · 2 дня / 2 ночи / 2 выходных</div>
+  </div>
+
+  <div class="selectors">
+    <select id="monthSelect"></select>
+    <select id="yearSelect"></select>
   </div>
 
   <div class="nav">
@@ -245,76 +224,70 @@
     </div>
     <div class="days" id="days"></div>
   </div>
-
-  <div class="legend">
-    <div class="item">
-      <div class="swatch day">☀</div>
-      <div class="txt"><b>Дневная</b><span>08:00–20:00</span></div>
-    </div>
-    <div class="item">
-      <div class="swatch night">☾</div>
-      <div class="txt"><b>Ночная</b><span>20:00–08:00</span></div>
-    </div>
-    <div class="item">
-      <div class="swatch off">🏠</div>
-      <div class="txt"><b>Выходной</b><span>отдых</span></div>
-    </div>
-    <div class="item">
-      <div class="swatch today"></div>
-      <div class="txt"><b>Сегодня</b><span>текущий день</span></div>
-    </div>
-  </div>
 </div>
 
 <script>
 (function () {
   'use strict';
 
-  // ===== Точка отсчёта =====
-  // 1 ноября 2026 = 2-й выходной из пары (В2).
-  // Цикл: Д1 Д2 Н1 Н2 В1 В2
-  const ANCHOR = new Date(2026, 10, 1); // 1 ноября 2026
-  const ANCHOR_OFFSET = 5; // 0=Д1, 1=Д2, 2=Н1, 3=Н2, 4=В1, 5=В2
+  // 1 ноября 2026 = 2-й выходной (В2)
+  const ANCHOR = new Date(2026, 10, 1);
+  const ANCHOR_OFFSET = 5; // 0=Д1 1=Д2 2=Н1 3=Н2 4=В1 5=В2
 
   const CYCLE = [
-    { type: 'day',   label: 'Дневная',   time: '08:00–20:00', icon: '☀' },
-    { type: 'day',   label: 'Дневная',   time: '08:00–20:00', icon: '☀' },
-    { type: 'night', label: 'Ночная',    time: '20:00–08:00', icon: '☾' },
-    { type: 'night', label: 'Ночная',    time: '20:00–08:00', icon: '☾' },
-    { type: 'off',   label: 'Выходной',  time: '',            icon: '🏠' },
-    { type: 'off',   label: 'Выходной',  time: '',            icon: '🏠' }
+    { type: 'day',   time: '08–20',  icon: '☀' },
+    { type: 'day',   time: '08–20',  icon: '☀' },
+    { type: 'night', time: '20–08',  icon: '☾' },
+    { type: 'night', time: '20–08',  icon: '☾' },
+    { type: 'off',   time: '',       icon: '🏠' },
+    { type: 'off',   time: '',       icon: '🏠' }
   ];
 
   const MONTHS = [
-    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    'Январь','Февраль','Март','Апрель','Май','Июнь',
+    'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'
   ];
 
-  // ===== Утилиты дат =====
-  function startOfDay(d) {
-    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  }
+  function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
   function daysBetween(a, b) {
-    const MS = 24 * 60 * 60 * 1000;
-    return Math.round((startOfDay(b) - startOfDay(a)) / MS);
+    return Math.round((startOfDay(b) - startOfDay(a)) / 86400000);
   }
   function shiftForDate(date) {
     const diff = daysBetween(ANCHOR, date);
-    // Правильный modulo для отрицательных чисел
     const idx = ((diff % 6) + 6) % 6;
-    // Смещение в цикле: anchor_offset=5, значит для diff=0 берём CYCLE[5]
     const cycleIdx = ((ANCHOR_OFFSET + idx) % 6 + 6) % 6;
     return CYCLE[cycleIdx];
   }
 
-  // ===== Состояние =====
   const today = startOfDay(new Date());
   let viewYear = today.getFullYear();
   let viewMonth = today.getMonth();
 
-  // ===== Рендер =====
   const daysEl = document.getElementById('days');
   const titleEl = document.getElementById('monthTitle');
+  const monthSelect = document.getElementById('monthSelect');
+  const yearSelect = document.getElementById('yearSelect');
+
+  // Заполняем селекторы
+  MONTHS.forEach((m, i) => {
+    const o = document.createElement('option');
+    o.value = i; o.textContent = m;
+    monthSelect.appendChild(o);
+  });
+
+  const THIS_YEAR = today.getFullYear();
+  const START_YEAR = 2020;
+  const END_YEAR = 2040;
+  for (let y = START_YEAR; y <= END_YEAR; y++) {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    yearSelect.appendChild(o);
+  }
+
+  function syncSelectors() {
+    monthSelect.value = viewMonth;
+    yearSelect.value = viewYear;
+  }
 
   function render() {
     titleEl.textContent = MONTHS[viewMonth] + ' ' + viewYear;
@@ -323,38 +296,27 @@
     const last = new Date(viewYear, viewMonth + 1, 0);
     const daysInMonth = last.getDate();
 
-    // Понедельник = 0, воскресенье = 6
     let firstWeekday = first.getDay() - 1;
     if (firstWeekday < 0) firstWeekday = 6;
 
     const cells = [];
 
-    // Дни предыдущего месяца
     if (firstWeekday > 0) {
       const prevLast = new Date(viewYear, viewMonth, 0).getDate();
       for (let i = firstWeekday - 1; i >= 0; i--) {
-        const d = prevLast - i;
-        const date = new Date(viewYear, viewMonth - 1, d);
-        cells.push({ date, other: true });
+        cells.push({ date: new Date(viewYear, viewMonth - 1, prevLast - i), other: true });
       }
     }
-
-    // Дни текущего месяца
     for (let d = 1; d <= daysInMonth; d++) {
       cells.push({ date: new Date(viewYear, viewMonth, d), other: false });
     }
-
-    // Дни следующего месяца — до конца недели
     const remainder = cells.length % 7;
     if (remainder !== 0) {
-      const need = 7 - remainder;
-      for (let d = 1; d <= need; d++) {
-        const date = new Date(viewYear, viewMonth + 1, d);
-        cells.push({ date, other: true });
+      for (let d = 1; d <= 7 - remainder; d++) {
+        cells.push({ date: new Date(viewYear, viewMonth + 1, d), other: true });
       }
     }
 
-    // Сборка HTML
     let html = '';
     for (const c of cells) {
       const info = shiftForDate(c.date);
@@ -362,34 +324,44 @@
       if (c.other) cls.push('other');
       if (!c.other && daysBetween(today, c.date) === 0) cls.push('today');
 
-      const showDetails = !c.other;
-      html += `<div class="${cls.join(' ')}">
-        <div class="num">${c.date.getDate()}</div>
-        ${showDetails ? `
-          <div class="label">${info.label}</div>
-          ${info.time ? `<div class="time">${info.time}</div>` : ''}
+      if (c.other) {
+        html += `<div class="${cls.join(' ')}"><div class="num">${c.date.getDate()}</div></div>`;
+      } else {
+        html += `<div class="${cls.join(' ')}">
+          <div class="num">${c.date.getDate()}</div>
           <div class="icon">${info.icon}</div>
-        ` : ''}
-      </div>`;
+          ${info.time ? `<div class="time">${info.time}</div>` : '<div class="time">&nbsp;</div>'}
+        </div>`;
+      }
     }
     daysEl.innerHTML = html;
   }
 
-  // ===== Навигация =====
-  document.getElementById('prevBtn').addEventListener('click', () => {
-    viewMonth--;
-    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+  function goTo(y, m) {
+    viewYear = y; viewMonth = m;
+    syncSelectors();
     render();
+  }
+
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    let m = viewMonth - 1, y = viewYear;
+    if (m < 0) { m = 11; y--; }
+    goTo(y, m);
   });
   document.getElementById('nextBtn').addEventListener('click', () => {
-    viewMonth++;
-    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
-    render();
+    let m = viewMonth + 1, y = viewYear;
+    if (m > 11) { m = 0; y++; }
+    goTo(y, m);
   });
   document.getElementById('todayBtn').addEventListener('click', () => {
-    viewYear = today.getFullYear();
-    viewMonth = today.getMonth();
-    render();
+    goTo(today.getFullYear(), today.getMonth());
+  });
+
+  monthSelect.addEventListener('change', () => {
+    goTo(viewYear, parseInt(monthSelect.value, 10));
+  });
+  yearSelect.addEventListener('change', () => {
+    goTo(parseInt(yearSelect.value, 10), viewMonth);
   });
 
   // Свайпы
@@ -407,6 +379,7 @@
     touchStartX = null;
   }, { passive: true });
 
+  syncSelectors();
   render();
 })();
 </script>
