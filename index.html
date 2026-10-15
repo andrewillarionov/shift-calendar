@@ -23,6 +23,8 @@
     --muted: #888;
     --border: #E6E6E6;
     --accent: #111;
+    --ok: #2E7D32;
+    --err: #C62828;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -40,6 +42,29 @@
     margin: 0 auto;
     padding: 10px 8px 24px;
   }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 4px 0;
+  }
+  .topbar .spacer { width: 40px; height: 40px; }
+  .topbar .burger {
+    width: 40px; height: 40px;
+    border: none;
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--text);
+    font-family: inherit;
+  }
+  .topbar .burger:active { transform: scale(0.95); }
 
   .header { text-align: center; padding: 4px 0 2px; }
   .header h1 {
@@ -154,7 +179,6 @@
     cursor: default;
   }
 
-  /* Чёрный квадрат */
   .cell.black {
     background: #111 !important;
     color: #fff !important;
@@ -162,12 +186,7 @@
   .cell.black .icon,
   .cell.black .time { color: #fff !important; }
 
-  .cell .num {
-    font-size: 15px;
-    font-weight: 800;
-    line-height: 1;
-    margin-top: 2px;
-  }
+  .cell .num { font-size: 15px; font-weight: 800; line-height: 1; margin-top: 2px; }
   .cell .icon { font-size: 18px; line-height: 1; }
   .cell .time {
     font-size: 9px;
@@ -180,13 +199,10 @@
   .cell.today { box-shadow: inset 0 0 0 2.5px var(--today-ring); }
   .cell.black.today { box-shadow: inset 0 0 0 2.5px #fff; }
 
-  /* Индикатор ручной отметки */
   .cell .dot {
     position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 6px;
-    height: 6px;
+    top: 4px; right: 4px;
+    width: 6px; height: 6px;
     border-radius: 50%;
     background: #E5484D;
   }
@@ -199,7 +215,18 @@
     .header h1 { font-size: 22px; }
   }
 
-  /* ===== Модалка ===== */
+  /* Статус-бар снизу */
+  .status {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 12px;
+    min-height: 16px;
+  }
+  .status.ok  { color: var(--ok); }
+  .status.err { color: var(--err); }
+
+  /* ===== Модалка дня ===== */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -208,7 +235,6 @@
     align-items: flex-end;
     justify-content: center;
     z-index: 100;
-    padding: 0;
   }
   .modal-overlay.open { display: flex; }
 
@@ -227,23 +253,15 @@
     to   { transform: translateY(0);    opacity: 1; }
   }
 
-  .modal .grabber {
+  .grabber {
     width: 40px; height: 4px;
     background: #DDD;
     border-radius: 2px;
     margin: 0 auto 12px;
   }
 
-  .modal h2 {
-    margin: 0 0 4px;
-    font-size: 20px;
-    font-weight: 800;
-  }
-  .modal .date-sub {
-    color: var(--muted);
-    font-size: 13px;
-    margin-bottom: 14px;
-  }
+  .modal h2 { margin: 0 0 4px; font-size: 20px; font-weight: 800; }
+  .modal .date-sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
 
   .field { margin-bottom: 14px; }
   .field label {
@@ -256,7 +274,6 @@
     margin-bottom: 6px;
   }
 
-  /* Кнопки-переключатели типа */
   .segmented {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -275,21 +292,13 @@
     padding: 10px 4px;
     border-radius: 9px;
     cursor: pointer;
-    transition: background .12s ease, color .12s ease;
   }
-  .segmented button.active {
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-  }
+  .segmented button.active { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
   .segmented button[data-shift="day"].active   { background: var(--day-bg);   color: var(--day-fg); }
   .segmented button[data-shift="night"].active { background: var(--night-bg); color: var(--night-fg); }
   .segmented button[data-shift="off"].active   { background: var(--off-bg);   color: var(--off-fg); }
 
-  .time-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
+  .time-row { display: flex; gap: 10px; align-items: center; }
   .time-row input[type="time"] {
     flex: 1;
     border: 1px solid var(--border);
@@ -303,7 +312,7 @@
   }
   .time-row .sep { color: var(--muted); font-weight: 700; }
 
-  input[type="text"] {
+  input[type="text"], input[type="password"] {
     width: 100%;
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -313,8 +322,7 @@
     background: #fff;
     color: var(--text);
   }
-  input[type="text"]:focus,
-  input[type="time"]:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
   .checkbox-row {
     display: flex;
@@ -355,10 +363,71 @@
   .btn-cancel  { background: #F2F2F2; color: #333; }
   .btn-delete  { background: #FFE5E5; color: #B71C1C; }
   .btn-save    { background: #111; color: #fff; }
+  .btn-save:disabled { background: #CCC; cursor: not-allowed; }
+
+  /* ===== Меню (бургер) ===== */
+  .menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 110;
+  }
+  .menu-overlay.open { display: flex; }
+
+  .menu {
+    background: #fff;
+    width: 100%;
+    max-width: 720px;
+    border-radius: 20px 20px 0 0;
+    padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp .22s ease;
+  }
+  .menu h2 { margin: 0 0 14px; font-size: 20px; font-weight: 800; }
+
+  .hint {
+    background: #F7F7F7;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+  .hint a { color: #111; }
+
+  .menu-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .menu-actions button {
+    border: none;
+    border-radius: 12px;
+    padding: 14px 8px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-primary   { background: #111; color: #fff; }
+  .btn-secondary { background: #F2F2F2; color: #333; }
 </style>
 </head>
 <body>
 <div class="app">
+
+  <div class="topbar">
+    <div class="spacer"></div>
+    <div class="spacer"></div>
+    <button class="burger" id="burgerBtn" aria-label="Меню">☰</button>
+  </div>
+
   <div class="header">
     <h1 id="monthTitle">—</h1>
     <div class="sub">График смен · 2 дня / 2 ночи / 2 выходных</div>
@@ -382,11 +451,13 @@
     </div>
     <div class="days" id="days"></div>
   </div>
+
+  <div class="status" id="status"></div>
 </div>
 
-<!-- ===== Модалка ===== -->
+<!-- ===== Модалка дня ===== -->
 <div class="modal-overlay" id="modalOverlay">
-  <div class="modal" id="modal">
+  <div class="modal">
     <div class="grabber"></div>
     <h2 id="modalTitle">—</h2>
     <div class="date-sub" id="modalSub">—</div>
@@ -435,13 +506,48 @@
   </div>
 </div>
 
+<!-- ===== Меню ===== -->
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu">
+    <div class="grabber"></div>
+    <h2>Настройки</h2>
+
+    <div class="hint" id="tokenHint">
+      Чтобы редактировать календарь, нужен токен GitHub.<br>
+      Репозиторий: <a href="https://github.com/andrewillarionov/shift-calendar" target="_blank">andrewillarionov/shift-calendar</a><br><br>
+      Токен хранится только на этом устройстве.
+    </div>
+
+    <div class="field">
+      <label>Токен GitHub</label>
+      <input type="password" id="tokenInput" placeholder="github_pat_..." autocomplete="off" spellcheck="false">
+    </div>
+
+    <div class="menu-actions">
+      <button class="btn-secondary" id="btnPull">Обновить с GitHub</button>
+      <button class="btn-primary" id="btnSaveToken">Сохранить токен</button>
+    </div>
+
+    <div class="menu-actions" style="grid-template-columns: 1fr;">
+      <button class="btn-secondary" id="btnClearToken">Удалить токен с устройства</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   'use strict';
 
-  // ===== Константы =====
-  const ANCHOR = new Date(2026, 10, 1); // 1 ноября 2026
-  const ANCHOR_OFFSET = 5;              // 0=Д1 1=Д2 2=Н1 3=Н2 4=В1 5=В2
+  // ===== Настройки репозитория =====
+  const OWNER = 'andrewillarionov';
+  const REPO  = 'shift-calendar';
+  const FILE  = 'data.json';
+  const BRANCH = 'main';
+  const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
+
+  // ===== График =====
+  const ANCHOR = new Date(2026, 10, 1);
+  const ANCHOR_OFFSET = 5;
 
   const CYCLE = [
     { type: 'day',   time: '08–20', icon: '☀' },
@@ -452,50 +558,31 @@
     { type: 'off',   time: '',      icon: '🏠' }
   ];
 
-  const MONTHS = [
-    'Январь','Февраль','Март','Апрель','Май','Июнь',
-    'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'
-  ];
-  const MONTHS_GEN = [
-    'января','февраля','марта','апреля','мая','июня',
-    'июля','августа','сентября','октября','ноября','декабря'
-  ];
+  const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  const MONTHS_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
   const WEEKDAYS = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 
-  const STORAGE_KEY = 'shift-calendar-data-v1';
+  const TOKEN_KEY = 'shift-calendar-token-v1';
 
   // ===== Утилиты =====
   function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
-  function daysBetween(a, b) {
-    return Math.round((startOfDay(b) - startOfDay(a)) / 86400000);
-  }
+  function daysBetween(a, b) { return Math.round((startOfDay(b) - startOfDay(a)) / 86400000); }
   function shiftForDate(date) {
     const diff = daysBetween(ANCHOR, date);
     const idx = ((diff % 6) + 6) % 6;
-    const cycleIdx = ((ANCHOR_OFFSET + idx) % 6 + 6) % 6;
-    return CYCLE[cycleIdx];
+    return CYCLE[((ANCHOR_OFFSET + idx) % 6 + 6) % 6];
   }
   function dateKey(d) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${dd}`;
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
-
-  // ===== Хранилище =====
-  let data = {};
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) data = JSON.parse(raw) || {};
-  } catch (e) { data = {}; }
-
-  function saveData() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch (e) {}
+  function shortTime(from, to) {
+    const short = t => { const [h,m] = t.split(':'); return m === '00' ? h : `${h}:${m}`; };
+    return `${short(from)}–${short(to)}`;
   }
 
   // ===== Состояние =====
+  let data = {};               // данные с GitHub
+  let token = localStorage.getItem(TOKEN_KEY) || '';
   const today = startOfDay(new Date());
   let viewYear = today.getFullYear();
   let viewMonth = today.getMonth();
@@ -505,8 +592,8 @@
   const titleEl = document.getElementById('monthTitle');
   const monthSelect = document.getElementById('monthSelect');
   const yearSelect = document.getElementById('yearSelect');
+  const statusEl = document.getElementById('status');
 
-  // Модалка
   const modalOverlay = document.getElementById('modalOverlay');
   const modalTitle = document.getElementById('modalTitle');
   const modalSub = document.getElementById('modalSub');
@@ -517,8 +604,12 @@
   const carInput = document.getElementById('carInput');
   const noteInput = document.getElementById('noteInput');
   const blackCheck = document.getElementById('blackCheck');
+  const btnSave = document.getElementById('btnSave');
 
-  let editingDate = null; // Date объекта, который редактируем
+  const menuOverlay = document.getElementById('menuOverlay');
+  const tokenInput = document.getElementById('tokenInput');
+
+  let editingDate = null;
 
   // ===== Селекторы =====
   MONTHS.forEach((m, i) => {
@@ -531,13 +622,100 @@
     o.value = y; o.textContent = y;
     yearSelect.appendChild(o);
   }
-
   function syncSelectors() {
     monthSelect.value = viewMonth;
     yearSelect.value = viewYear;
   }
 
-  // ===== Рендер календаря =====
+  // ===== Статус =====
+  function setStatus(text, kind) {
+    statusEl.textContent = text;
+    statusEl.className = 'status' + (kind ? ' ' + kind : '');
+  }
+
+  // ===== GitHub API =====
+  // base64 <-> utf8 helpers
+  function b64encodeUtf8(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function b64decodeUtf8(b64) {
+    return decodeURIComponent(escape(atob(b64.replace(/\n/g, ''))));
+  }
+
+  async function ghRead() {
+    // Публичное чтение — без токена, но с кеш-бастером
+    const url = `${API}?ref=${BRANCH}&t=${Date.now()}`;
+    const headers = { 'Accept': 'application/vnd.github+json' };
+    const res = await fetch(url, { headers, cache: 'no-store' });
+    if (res.status === 404) {
+      return { data: {}, sha: null };
+    }
+    if (!res.ok) throw new Error('GET ' + res.status);
+    const json = await res.json();
+    let parsed = {};
+    try { parsed = JSON.parse(b64decodeUtf8(json.content)); } catch (e) { parsed = {}; }
+    return { data: parsed, sha: json.sha };
+  }
+
+  async function ghWrite(newData, sha) {
+    if (!token) throw new Error('NO_TOKEN');
+    const body = {
+      message: 'update calendar ' + new Date().toISOString(),
+      content: b64encodeUtf8(JSON.stringify(newData, null, 2)),
+      branch: BRANCH
+    };
+    if (sha) body.sha = sha;
+    const res = await fetch(API, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error('PUT ' + res.status + ' ' + t);
+    }
+    return res.json();
+  }
+
+  async function pullFromGitHub(silent) {
+    try {
+      if (!silent) setStatus('Синхронизация…');
+      const { data: remote } = await ghRead();
+      data = remote || {};
+      render();
+      setStatus('✓ Синхронизировано', 'ok');
+    } catch (e) {
+      console.error(e);
+      setStatus('✗ Ошибка загрузки: ' + e.message, 'err');
+    }
+  }
+
+  // Сохранение с учётом свежего sha
+  async function saveToGitHub(updatedData) {
+    if (!token) {
+      setStatus('Токен не задан — только просмотр', 'err');
+      return false;
+    }
+    try {
+      setStatus('Сохранение…');
+      // 1. Читаем свежий sha
+      const { sha } = await ghRead();
+      // 2. Пишем
+      await ghWrite(updatedData, sha);
+      setStatus('✓ Сохранено', 'ok');
+      return true;
+    } catch (e) {
+      console.error(e);
+      setStatus('✗ Ошибка сохранения: ' + e.message, 'err');
+      return false;
+    }
+  }
+
+  // ===== Рендер =====
   function render() {
     titleEl.textContent = MONTHS[viewMonth] + ' ' + viewYear;
 
@@ -570,12 +748,11 @@
       const base = shiftForDate(c.date);
       const rec = data[dateKey(c.date)] || null;
 
-      // Итоговый тип с учётом override
       let type = base.type, timeStr = base.time, icon = base.icon;
       if (rec) {
-        if (rec.shift === 'day')   { type = 'day';   timeStr = rec.timeFrom && rec.timeTo ? shortTime(rec.timeFrom, rec.timeTo) : '08–20'; icon = '☀'; }
-        if (rec.shift === 'night') { type = 'night'; timeStr = rec.timeFrom && rec.timeTo ? shortTime(rec.timeFrom, rec.timeTo) : '20–08'; icon = '☾'; }
-        if (rec.shift === 'off')   { type = 'off';   timeStr = ''; icon = '🏠'; }
+        if (rec.shift === 'day')   { type='day';   timeStr = (rec.timeFrom && rec.timeTo) ? shortTime(rec.timeFrom, rec.timeTo) : '08–20'; icon='☀'; }
+        if (rec.shift === 'night') { type='night'; timeStr = (rec.timeFrom && rec.timeTo) ? shortTime(rec.timeFrom, rec.timeTo) : '20–08'; icon='☾'; }
+        if (rec.shift === 'off')   { type='off';   timeStr = ''; icon='🏠'; }
       }
 
       const cls = ['cell', type];
@@ -583,7 +760,7 @@
       if (rec && rec.black) cls.push('black');
       if (!c.other && daysBetween(today, c.date) === 0) cls.push('today');
 
-      const dot = rec && !c.other ? '<div class="dot"></div>' : '';
+      const dot = (rec && !c.other) ? '<div class="dot"></div>' : '';
 
       if (c.other) {
         html += `<div class="${cls.join(' ')}"><div class="num">${c.date.getDate()}</div></div>`;
@@ -598,43 +775,32 @@
     }
     daysEl.innerHTML = html;
 
-    // Вешаем обработчики на ячейки
     daysEl.querySelectorAll('.cell[data-date]').forEach(el => {
       el.addEventListener('click', () => openModal(el.dataset.date));
     });
   }
 
-  function shortTime(from, to) {
-    // "18:00" → "18", "22:30" → "22:30"
-    const short = (t) => {
-      const [h, m] = t.split(':');
-      return (m === '00') ? h : `${h}:${m}`;
-    };
-    return `${short(from)}–${short(to)}`;
-  }
-
-  // ===== Модалка =====
+  // ===== Модалка дня =====
   function openModal(key) {
     editingDate = key;
     const [y, m, d] = key.split('-').map(Number);
     const dateObj = new Date(y, m - 1, d);
 
-    modalTitle.textContent = `${d} ${MONTHS_GEN[m - 1]} ${y}`;
+    modalTitle.textContent = `${d} ${MONTHS_GEN[m-1]} ${y}`;
     modalSub.textContent = WEEKDAYS[dateObj.getDay()] + ' · по графику: ' + describeBase(dateObj);
 
     const rec = data[key] || {};
-
-    // Устанавливаем тип
     setShiftSegment(rec.shift || 'auto');
-
-    // Часы
     timeFrom.value = rec.timeFrom || '';
     timeTo.value = rec.timeTo || '';
-    updateTimeVisibility(rec.shift || 'auto');
-
     carInput.value = rec.car || '';
     noteInput.value = rec.note || '';
     blackCheck.checked = !!rec.black;
+
+    // Если нет токена — режим просмотра
+    const canEdit = !!token;
+    btnSave.disabled = !canEdit;
+    btnSave.textContent = canEdit ? 'Сохранить' : 'Только просмотр';
 
     modalOverlay.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -657,12 +823,7 @@
     shiftSeg.querySelectorAll('button').forEach(b => {
       b.classList.toggle('active', b.dataset.shift === val);
     });
-    updateTimeVisibility(val);
-  }
-
-  function updateTimeVisibility(val) {
-    const show = (val === 'day' || val === 'night');
-    timeField.style.display = show ? '' : 'none';
+    timeField.style.display = (val === 'day' || val === 'night') ? '' : 'none';
   }
 
   shiftSeg.addEventListener('click', (e) => {
@@ -673,46 +834,55 @@
 
   document.getElementById('btnCancel').addEventListener('click', closeModal);
 
-  document.getElementById('btnSave').addEventListener('click', () => {
-    if (!editingDate) return;
+  btnSave.addEventListener('click', async () => {
+    if (!editingDate || !token) return;
     const shift = shiftSeg.querySelector('button.active')?.dataset.shift || 'auto';
 
-    // Если всё по графику и нет доп. данных — удаляем запись
     const isEmpty = (
       shift === 'auto' &&
       !carInput.value.trim() &&
       !noteInput.value.trim() &&
       !blackCheck.checked
     );
+
+    const newData = Object.assign({}, data);
+
     if (isEmpty) {
-      delete data[editingDate];
+      delete newData[editingDate];
     } else {
-      data[editingDate] = {
-        shift: shift === 'auto' ? undefined : shift,
-        timeFrom: shift === 'day' || shift === 'night' ? (timeFrom.value || '') : '',
-        timeTo:   shift === 'day' || shift === 'night' ? (timeTo.value || '')   : '',
-        car: carInput.value.trim(),
-        note: noteInput.value.trim(),
-        black: blackCheck.checked
-      };
-      // Убираем undefined
-      Object.keys(data[editingDate]).forEach(k => {
-        if (data[editingDate][k] === undefined || data[editingDate][k] === '') {
-          if (k !== 'black') delete data[editingDate][k];
-        }
-      });
+      const rec = {};
+      if (shift !== 'auto') rec.shift = shift;
+      if (shift === 'day' || shift === 'night') {
+        if (timeFrom.value) rec.timeFrom = timeFrom.value;
+        if (timeTo.value)   rec.timeTo = timeTo.value;
+      }
+      if (carInput.value.trim())  rec.car = carInput.value.trim();
+      if (noteInput.value.trim()) rec.note = noteInput.value.trim();
+      if (blackCheck.checked)     rec.black = true;
+      newData[editingDate] = rec;
     }
-    saveData();
-    closeModal();
+
+    // Оптимистично
+    data = newData;
     render();
+    closeModal();
+
+    const ok = await saveToGitHub(newData);
+    if (!ok) {
+      // откат
+      await pullFromGitHub(true);
+    }
   });
 
-  document.getElementById('btnDelete').addEventListener('click', () => {
-    if (!editingDate) return;
-    delete data[editingDate];
-    saveData();
-    closeModal();
+  document.getElementById('btnDelete').addEventListener('click', async () => {
+    if (!editingDate || !token) return;
+    const newData = Object.assign({}, data);
+    delete newData[editingDate];
+    data = newData;
     render();
+    closeModal();
+    const ok = await saveToGitHub(newData);
+    if (!ok) await pullFromGitHub(true);
   });
 
   modalOverlay.addEventListener('click', (e) => {
@@ -740,12 +910,8 @@
     goTo(today.getFullYear(), today.getMonth());
   });
 
-  monthSelect.addEventListener('change', () => {
-    goTo(viewYear, parseInt(monthSelect.value, 10));
-  });
-  yearSelect.addEventListener('change', () => {
-    goTo(parseInt(yearSelect.value, 10), viewMonth);
-  });
+  monthSelect.addEventListener('change', () => goTo(viewYear, parseInt(monthSelect.value, 10)));
+  yearSelect.addEventListener('change', () => goTo(parseInt(yearSelect.value, 10), viewMonth));
 
   // Свайпы
   let touchStartX = null;
@@ -762,8 +928,57 @@
     touchStartX = null;
   }, { passive: true });
 
+  // ===== Меню =====
+  document.getElementById('burgerBtn').addEventListener('click', () => {
+    tokenInput.value = token ? '••••••••••••••••' : '';
+    menuOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+  menuOverlay.addEventListener('click', (e) => {
+    if (e.target === menuOverlay) {
+      menuOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+
+  document.getElementById('btnSaveToken').addEventListener('click', async () => {
+    const val = tokenInput.value.trim();
+    if (!val) {
+      setStatus('Введи токен', 'err');
+      return;
+    }
+    // если placeholder — не трогаем
+    if (val.includes('•')) {
+      menuOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+      return;
+    }
+    token = val;
+    localStorage.setItem(TOKEN_KEY, token);
+    menuOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+    setStatus('Токен сохранён', 'ok');
+    // Проверим и попробуем залить локальные изменения? Пока просто перечитаем
+    await pullFromGitHub();
+  });
+
+  document.getElementById('btnClearToken').addEventListener('click', () => {
+    token = '';
+    localStorage.removeItem(TOKEN_KEY);
+    tokenInput.value = '';
+    setStatus('Токен удалён — режим просмотра');
+  });
+
+  document.getElementById('btnPull').addEventListener('click', async () => {
+    menuOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+    await pullFromGitHub();
+  });
+
+  // ===== Старт =====
   syncSelectors();
   render();
+  pullFromGitHub();
 })();
 </script>
 </body>
