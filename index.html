@@ -5,15 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Смены">
+<link rel="apple-touch-icon" href="icon.png">
 <title>График смен</title>
 <style>
   :root {
-    --day-bg: #FFF3C4;
-    --day-fg: #7A5A00;
-    --night-bg: #D6E4FF;
-    --night-fg: #1E3A8A;
-    --off-bg: #FFD9DE;
-    --off-fg: #8B1F2F;
+    --day-bg: #FCEFC7;
+    --day-fg: #6B4E00;
+    --day-icon: #E8A400;
+    --night-bg: #D7E3FA;
+    --night-fg: #17307A;
+    --night-icon: #3D5BC9;
+    --off-bg: #FBDADF;
+    --off-fg: #7A1622;
+    --off-icon: #D23B44;
     --other-bg: #F0F0F0;
     --other-fg: #BDBDBD;
     --today-ring: #111;
@@ -22,7 +27,6 @@
     --text: #1A1A1A;
     --muted: #888;
     --border: #E6E6E6;
-    --accent: #111;
     --ok: #2E7D32;
     --err: #C62828;
   }
@@ -69,14 +73,15 @@
   .header { text-align: center; padding: 4px 0 2px; }
   .header h1 {
     margin: 0;
-    font-size: 24px;
     font-weight: 800;
     letter-spacing: -0.5px;
+    font-size: clamp(20px, 6vw, 28px);
+    text-transform: capitalize;
   }
   .header .sub {
     color: var(--muted);
-    font-size: 12px;
     margin-top: 2px;
+    font-size: clamp(11px, 3vw, 13px);
   }
 
   .selectors { display: flex; gap: 8px; margin: 12px 0 8px; }
@@ -89,9 +94,9 @@
     color: var(--text);
     border-radius: 12px;
     padding: 12px 14px;
-    font-size: 15px;
     font-weight: 600;
     font-family: inherit;
+    font-size: clamp(14px, 3.8vw, 15px);
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
     background-repeat: no-repeat;
@@ -113,11 +118,11 @@
     color: var(--text);
     border-radius: 12px;
     padding: 12px 0;
-    font-size: 16px;
     font-weight: 700;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     cursor: pointer;
     font-family: inherit;
+    font-size: clamp(14px, 4vw, 16px);
     transition: transform .08s ease;
   }
   .nav button:active { transform: scale(0.95); }
@@ -134,30 +139,32 @@
   .weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: 3px;
     margin-bottom: 4px;
   }
   .weekdays div {
     text-align: center;
-    font-size: 10px;
     font-weight: 700;
     color: var(--muted);
     padding: 6px 0;
     text-transform: uppercase;
+    letter-spacing: 0.2px;
+    font-size: clamp(8.5px, 2.3vw, 11px);
   }
   .weekdays div.we { color: #C2410C; }
 
   .days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: 3px;
   }
 
   .cell {
     position: relative;
-    border-radius: 12px;
-    aspect-ratio: 1 / 1.05;
-    padding: 4px 2px;
+    border-radius: 5px;
+    /* Ключевое: растянутая по вертикали ячейка + минимум padding */
+    aspect-ratio: 1 / 1.18;
+    padding: 3px 2px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -183,37 +190,61 @@
     background: #111 !important;
     color: #fff !important;
   }
-  .cell.black .icon,
-  .cell.black .time { color: #fff !important; }
 
-  .cell .num { font-size: 15px; font-weight: 800; line-height: 1; margin-top: 2px; }
-  .cell .icon { font-size: 18px; line-height: 1; }
-  .cell .time {
-    font-size: 9px;
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.2px;
-    margin-bottom: 1px;
+  .cell .num {
+    font-weight: 800;
+    line-height: 1;
+    margin-top: 1px;
+    font-size: clamp(13px, 4.2vw, 18px);
   }
 
-  .cell.today { box-shadow: inset 0 0 0 2.5px var(--today-ring); }
-  .cell.black.today { box-shadow: inset 0 0 0 2.5px #fff; }
+  .cell .label {
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: 0.1px;
+    font-size: clamp(6.5px, 1.85vw, 9px);
+    text-align: center;
+    white-space: nowrap;
+    margin-top: 1px;
+  }
+
+  .cell .time {
+    font-weight: 700;
+    line-height: 1;
+    font-size: clamp(6px, 1.75vw, 8.5px);
+    text-align: center;
+    white-space: nowrap;
+    opacity: 0.9;
+    margin-top: 1px;
+  }
+
+  .cell .icon {
+    line-height: 0;
+    margin-bottom: 1px;
+    margin-top: auto;
+  }
+  .cell .icon svg {
+    display: block;
+    width: clamp(11px, 3.2vw, 15px);
+    height: clamp(11px, 3.2vw, 15px);
+  }
+  .cell.day   .icon svg { color: var(--day-icon); }
+  .cell.night .icon svg { color: var(--night-icon); }
+  .cell.off   .icon svg { color: var(--off-icon); }
+  .cell.black .icon svg { color: #fff; }
+
+  .cell.today { box-shadow: inset 0 0 0 2px var(--today-ring); }
+  .cell.black.today { box-shadow: inset 0 0 0 2px #fff; }
 
   .cell .dot {
     position: absolute;
-    top: 4px; right: 4px;
-    width: 6px; height: 6px;
+    top: 3px; right: 3px;
+    width: 5px; height: 5px;
     border-radius: 50%;
     background: #E5484D;
   }
   .cell.black .dot { background: #fff; }
-
-  @media (max-width: 400px) {
-    .cell .num { font-size: 14px; }
-    .cell .icon { font-size: 16px; }
-    .cell .time { font-size: 8.5px; }
-    .header h1 { font-size: 22px; }
-  }
 
   /* Статус-бар снизу */
   .status {
@@ -322,7 +353,7 @@
     background: #fff;
     color: var(--text);
   }
-  input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  input:focus { outline: 2px solid #111; border-color: transparent; }
 
   .checkbox-row {
     display: flex;
@@ -365,7 +396,7 @@
   .btn-save    { background: #111; color: #fff; }
   .btn-save:disabled { background: #CCC; cursor: not-allowed; }
 
-  /* ===== Меню (бургер) ===== */
+  /* ===== Меню ===== */
   .menu-overlay {
     position: fixed;
     inset: 0;
@@ -417,6 +448,34 @@
   }
   .btn-primary   { background: #111; color: #fff; }
   .btn-secondary { background: #F2F2F2; color: #333; }
+
+  /* ===== Легенда ===== */
+  .legend {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: var(--card);
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    font-size: 12px;
+  }
+  .legend .item { display: flex; align-items: center; gap: 8px; }
+  .legend .sw {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+  .legend .sw svg { width: 14px; height: 14px; display: block; }
+  .legend .sw.day   { background: var(--day-bg);   color: var(--day-icon); }
+  .legend .sw.night { background: var(--night-bg); color: var(--night-icon); }
+  .legend .sw.off   { background: var(--off-bg);   color: var(--off-icon); }
+  .legend .txt b { font-size: 12px; }
+  .legend .txt span { color: var(--muted); font-size: 11px; display: block; }
 </style>
 </head>
 <body>
@@ -451,6 +510,8 @@
     </div>
     <div class="days" id="days"></div>
   </div>
+
+  <div class="legend" id="legend"></div>
 
   <div class="status" id="status"></div>
 </div>
@@ -512,7 +573,7 @@
     <div class="grabber"></div>
     <h2>Настройки</h2>
 
-    <div class="hint" id="tokenHint">
+    <div class="hint">
       Чтобы редактировать календарь, нужен токен GitHub.<br>
       Репозиторий: <a href="https://github.com/andrewillarionov/shift-calendar" target="_blank">andrewillarionov/shift-calendar</a><br><br>
       Токен хранится только на этом устройстве.
@@ -550,13 +611,20 @@
   const ANCHOR_OFFSET = 5;
 
   const CYCLE = [
-    { type: 'day',   time: '08–20', icon: '☀' },
-    { type: 'day',   time: '08–20', icon: '☀' },
-    { type: 'night', time: '20–08', icon: '☾' },
-    { type: 'night', time: '20–08', icon: '☾' },
-    { type: 'off',   time: '',      icon: '🏠' },
-    { type: 'off',   time: '',      icon: '🏠' }
+    { type: 'day',   label: 'ДНЕВНАЯ',  time: '08:00–20:00' },
+    { type: 'day',   label: 'ДНЕВНАЯ',  time: '08:00–20:00' },
+    { type: 'night', label: 'НОЧНАЯ',   time: '20:00–08:00' },
+    { type: 'night', label: 'НОЧНАЯ',   time: '20:00–08:00' },
+    { type: 'off',   label: 'ВЫХОДНОЙ', time: '' },
+    { type: 'off',   label: 'ВЫХОДНОЙ', time: '' }
   ];
+
+  // SVG-иконки
+  const ICONS = {
+    sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7" y2="7"/><line x1="17" y1="17" x2="19.1" y2="19.1"/><line x1="4.9" y1="19.1" x2="7" y2="17"/><line x1="17" y1="7" x2="19.1" y2="4.9"/></svg>',
+    moon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
+    home: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2 2.5 11.4a1 1 0 0 0 .65 1.76H5v6.14A1.5 1.5 0 0 0 6.5 20.8h3.5v-5.3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5.3h3.5a1.5 1.5 0 0 0 1.5-1.5V13.16h1.85a1 1 0 0 0 .65-1.76L12 3.2z"/></svg>'
+  };
 
   const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
   const MONTHS_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
@@ -564,7 +632,6 @@
 
   const TOKEN_KEY = 'shift-calendar-token-v1';
 
-  // ===== Утилиты =====
   function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
   function daysBetween(a, b) { return Math.round((startOfDay(b) - startOfDay(a)) / 86400000); }
   function shiftForDate(date) {
@@ -575,24 +642,19 @@
   function dateKey(d) {
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
-  function shortTime(from, to) {
-    const short = t => { const [h,m] = t.split(':'); return m === '00' ? h : `${h}:${m}`; };
-    return `${short(from)}–${short(to)}`;
-  }
 
-  // ===== Состояние =====
-  let data = {};               // данные с GitHub
+  let data = {};
   let token = localStorage.getItem(TOKEN_KEY) || '';
   const today = startOfDay(new Date());
   let viewYear = today.getFullYear();
   let viewMonth = today.getMonth();
 
-  // ===== DOM =====
   const daysEl = document.getElementById('days');
   const titleEl = document.getElementById('monthTitle');
   const monthSelect = document.getElementById('monthSelect');
   const yearSelect = document.getElementById('yearSelect');
   const statusEl = document.getElementById('status');
+  const legendEl = document.getElementById('legend');
 
   const modalOverlay = document.getElementById('modalOverlay');
   const modalTitle = document.getElementById('modalTitle');
@@ -611,7 +673,7 @@
 
   let editingDate = null;
 
-  // ===== Селекторы =====
+  // Заполняем селекторы
   MONTHS.forEach((m, i) => {
     const o = document.createElement('option');
     o.value = i; o.textContent = m;
@@ -627,29 +689,40 @@
     yearSelect.value = viewYear;
   }
 
-  // ===== Статус =====
+  // Легенда
+  legendEl.innerHTML = `
+    <div class="item">
+      <div class="sw day">${ICONS.sun}</div>
+      <div class="txt"><b>Дневная</b><span>08:00–20:00</span></div>
+    </div>
+    <div class="item">
+      <div class="sw night">${ICONS.moon}</div>
+      <div class="txt"><b>Ночная</b><span>20:00–08:00</span></div>
+    </div>
+    <div class="item">
+      <div class="sw off">${ICONS.home}</div>
+      <div class="txt"><b>Выходной</b><span>отдых</span></div>
+    </div>
+    <div class="item">
+      <div class="sw" style="background:#fff;box-shadow:inset 0 0 0 2px #111;"></div>
+      <div class="txt"><b>Сегодня</b><span>текущий день</span></div>
+    </div>
+  `;
+
   function setStatus(text, kind) {
     statusEl.textContent = text;
     statusEl.className = 'status' + (kind ? ' ' + kind : '');
   }
 
-  // ===== GitHub API =====
-  // base64 <-> utf8 helpers
-  function b64encodeUtf8(str) {
-    return btoa(unescape(encodeURIComponent(str)));
-  }
-  function b64decodeUtf8(b64) {
-    return decodeURIComponent(escape(atob(b64.replace(/\n/g, ''))));
-  }
+  // ===== GitHub =====
+  function b64encodeUtf8(str) { return btoa(unescape(encodeURIComponent(str))); }
+  function b64decodeUtf8(b64) { return decodeURIComponent(escape(atob(b64.replace(/\n/g, '')))); }
 
   async function ghRead() {
-    // Публичное чтение — без токена, но с кеш-бастером
     const url = `${API}?ref=${BRANCH}&t=${Date.now()}`;
     const headers = { 'Accept': 'application/vnd.github+json' };
     const res = await fetch(url, { headers, cache: 'no-store' });
-    if (res.status === 404) {
-      return { data: {}, sha: null };
-    }
+    if (res.status === 404) return { data: {}, sha: null };
     if (!res.ok) throw new Error('GET ' + res.status);
     const json = await res.json();
     let parsed = {};
@@ -660,7 +733,7 @@
   async function ghWrite(newData, sha) {
     if (!token) throw new Error('NO_TOKEN');
     const body = {
-      message: 'update calendar ' + new Date().toISOString(),
+      message: 'update ' + new Date().toISOString(),
       content: b64encodeUtf8(JSON.stringify(newData, null, 2)),
       branch: BRANCH
     };
@@ -674,10 +747,7 @@
       },
       body: JSON.stringify(body)
     });
-    if (!res.ok) {
-      const t = await res.text();
-      throw new Error('PUT ' + res.status + ' ' + t);
-    }
+    if (!res.ok) throw new Error('PUT ' + res.status);
     return res.json();
   }
 
@@ -694,17 +764,11 @@
     }
   }
 
-  // Сохранение с учётом свежего sha
   async function saveToGitHub(updatedData) {
-    if (!token) {
-      setStatus('Токен не задан — только просмотр', 'err');
-      return false;
-    }
+    if (!token) { setStatus('Токен не задан — только просмотр', 'err'); return false; }
     try {
       setStatus('Сохранение…');
-      // 1. Читаем свежий sha
       const { sha } = await ghRead();
-      // 2. Пишем
       await ghWrite(updatedData, sha);
       setStatus('✓ Сохранено', 'ok');
       return true;
@@ -748,12 +812,14 @@
       const base = shiftForDate(c.date);
       const rec = data[dateKey(c.date)] || null;
 
-      let type = base.type, timeStr = base.time, icon = base.icon;
+      let type = base.type, label = base.label, timeStr = base.time;
       if (rec) {
-        if (rec.shift === 'day')   { type='day';   timeStr = (rec.timeFrom && rec.timeTo) ? shortTime(rec.timeFrom, rec.timeTo) : '08–20'; icon='☀'; }
-        if (rec.shift === 'night') { type='night'; timeStr = (rec.timeFrom && rec.timeTo) ? shortTime(rec.timeFrom, rec.timeTo) : '20–08'; icon='☾'; }
-        if (rec.shift === 'off')   { type='off';   timeStr = ''; icon='🏠'; }
+        if (rec.shift === 'day')   { type='day';   label='ДНЕВНАЯ';  timeStr = (rec.timeFrom && rec.timeTo) ? fullTime(rec.timeFrom, rec.timeTo) : '08:00–20:00'; }
+        if (rec.shift === 'night') { type='night'; label='НОЧНАЯ';   timeStr = (rec.timeFrom && rec.timeTo) ? fullTime(rec.timeFrom, rec.timeTo) : '20:00–08:00'; }
+        if (rec.shift === 'off')   { type='off';   label='ВЫХОДНОЙ'; timeStr = ''; }
       }
+
+      const iconSvg = type === 'day' ? ICONS.sun : type === 'night' ? ICONS.moon : ICONS.home;
 
       const cls = ['cell', type];
       if (c.other) cls.push('other');
@@ -768,8 +834,9 @@
         html += `<div class="${cls.join(' ')}" data-date="${dateKey(c.date)}">
           ${dot}
           <div class="num">${c.date.getDate()}</div>
-          <div class="icon">${icon}</div>
+          <div class="label">${label}</div>
           ${timeStr ? `<div class="time">${timeStr}</div>` : '<div class="time">&nbsp;</div>'}
+          <div class="icon">${iconSvg}</div>
         </div>`;
       }
     }
@@ -780,7 +847,15 @@
     });
   }
 
-  // ===== Модалка дня =====
+  function fullTime(from, to) {
+    // "8:00" → "08:00"
+    const pad = t => {
+      const [h, m] = t.split(':');
+      return `${String(h).padStart(2,'0')}:${m || '00'}`;
+    };
+    return `${pad(from)}–${pad(to)}`;
+  }
+
   function openModal(key) {
     editingDate = key;
     const [y, m, d] = key.split('-').map(Number);
@@ -797,7 +872,6 @@
     noteInput.value = rec.note || '';
     blackCheck.checked = !!rec.black;
 
-    // Если нет токена — режим просмотра
     const canEdit = !!token;
     btnSave.disabled = !canEdit;
     btnSave.textContent = canEdit ? 'Сохранить' : 'Только просмотр';
@@ -838,15 +912,9 @@
     if (!editingDate || !token) return;
     const shift = shiftSeg.querySelector('button.active')?.dataset.shift || 'auto';
 
-    const isEmpty = (
-      shift === 'auto' &&
-      !carInput.value.trim() &&
-      !noteInput.value.trim() &&
-      !blackCheck.checked
-    );
+    const isEmpty = (shift === 'auto' && !carInput.value.trim() && !noteInput.value.trim() && !blackCheck.checked);
 
     const newData = Object.assign({}, data);
-
     if (isEmpty) {
       delete newData[editingDate];
     } else {
@@ -861,17 +929,11 @@
       if (blackCheck.checked)     rec.black = true;
       newData[editingDate] = rec;
     }
-
-    // Оптимистично
     data = newData;
     render();
     closeModal();
-
     const ok = await saveToGitHub(newData);
-    if (!ok) {
-      // откат
-      await pullFromGitHub(true);
-    }
+    if (!ok) await pullFromGitHub(true);
   });
 
   document.getElementById('btnDelete').addEventListener('click', async () => {
@@ -889,7 +951,6 @@
     if (e.target === modalOverlay) closeModal();
   });
 
-  // ===== Навигация =====
   function goTo(y, m) {
     viewYear = y; viewMonth = m;
     syncSelectors();
@@ -913,7 +974,6 @@
   monthSelect.addEventListener('change', () => goTo(viewYear, parseInt(monthSelect.value, 10)));
   yearSelect.addEventListener('change', () => goTo(parseInt(yearSelect.value, 10), viewMonth));
 
-  // Свайпы
   let touchStartX = null;
   document.querySelector('.calendar').addEventListener('touchstart', (e) => {
     touchStartX = e.touches[0].clientX;
@@ -928,7 +988,6 @@
     touchStartX = null;
   }, { passive: true });
 
-  // ===== Меню =====
   document.getElementById('burgerBtn').addEventListener('click', () => {
     tokenInput.value = token ? '••••••••••••••••' : '';
     menuOverlay.classList.add('open');
@@ -943,11 +1002,7 @@
 
   document.getElementById('btnSaveToken').addEventListener('click', async () => {
     const val = tokenInput.value.trim();
-    if (!val) {
-      setStatus('Введи токен', 'err');
-      return;
-    }
-    // если placeholder — не трогаем
+    if (!val) { setStatus('Введи токен', 'err'); return; }
     if (val.includes('•')) {
       menuOverlay.classList.remove('open');
       document.body.style.overflow = '';
@@ -958,7 +1013,6 @@
     menuOverlay.classList.remove('open');
     document.body.style.overflow = '';
     setStatus('Токен сохранён', 'ok');
-    // Проверим и попробуем залить локальные изменения? Пока просто перечитаем
     await pullFromGitHub();
   });
 
@@ -975,7 +1029,6 @@
     await pullFromGitHub();
   });
 
-  // ===== Старт =====
   syncSelectors();
   render();
   pullFromGitHub();
