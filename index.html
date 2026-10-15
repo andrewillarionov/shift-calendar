@@ -17,6 +17,7 @@
     --other-bg: #F0F0F0;
     --other-fg: #BDBDBD;
     --today-ring: #111;
+    --edited-ring: #E5484D;
     --bg: #FAFAFA;
     --card: #FFFFFF;
     --text: #1A1A1A;
@@ -180,6 +181,7 @@
     cursor: default;
   }
 
+  /* Чёрный квадрат — оставляем как есть, ничего не трогаем */
   .cell.black {
     background: #111 !important;
     color: #fff !important;
@@ -190,6 +192,17 @@
   /* В базовом режиме ячейки некликабельны визуально */
   .cell.readonly { cursor: default; }
   .cell.readonly:active { filter: none; }
+
+  /* ===== Обводка для ячеек с правками ===== */
+  /* Только для НЕ чёрных ячеек. Чёрные — без обводки (они и так видны) */
+  .cell.edited:not(.black) {
+    box-shadow: inset 0 0 0 2.5px var(--edited-ring);
+  }
+  /* Если день ещё и «сегодня» — две рамки: внутри чёрная (сегодня), снаружи красная (правка) */
+  .cell.edited:not(.black).today {
+    box-shadow: inset 0 0 0 2.5px var(--today-ring),
+                0 0 0 2.5px var(--edited-ring);
+  }
 
   .cell .num { font-size: 15px; font-weight: 800; line-height: 1; margin-top: 2px; }
   .cell .icon { font-size: 18px; line-height: 1; }
@@ -204,14 +217,19 @@
   .cell.today { box-shadow: inset 0 0 0 2.5px var(--today-ring); }
   .cell.black.today { box-shadow: inset 0 0 0 2.5px #fff; }
 
+  /* Точка-индикатор — усилена */
   .cell .dot {
     position: absolute;
     top: 4px; right: 4px;
-    width: 6px; height: 6px;
+    width: 7px; height: 7px;
     border-radius: 50%;
-    background: #E5484D;
+    background: var(--edited-ring);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.9);
   }
-  .cell.black .dot { background: #fff; }
+  .cell.black .dot {
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.6);
+  }
 
   @media (max-width: 400px) {
     .cell .num { font-size: 14px; }
@@ -616,7 +634,6 @@
 
   let editingDate = null;
 
-  // Если базовый режим — прячем бургер и меняем подзаголовок
   if (BASE_MODE) {
     burgerBtn.classList.add('hidden');
     subTitleEl.textContent = 'График смен · 2 дня / 2 ночи / 2 выходных (просмотр)';
@@ -742,7 +759,6 @@
     let html = '';
     for (const c of cells) {
       const base = shiftForDate(c.date);
-      // В базовом режиме игнорируем правки
       const rec = BASE_MODE ? null : (data[dateKey(c.date)] || null);
 
       let type = base.type, timeStr = base.time, icon = base.icon;
@@ -755,6 +771,8 @@
       const cls = ['cell', type];
       if (c.other) cls.push('other');
       if (rec && rec.black) cls.push('black');
+      // Класс "edited" — для ячеек с ручными правками (обводка через CSS)
+      if (rec && !c.other) cls.push('edited');
       if (BASE_MODE && !c.other) cls.push('readonly');
       if (!c.other && daysBetween(today, c.date) === 0) cls.push('today');
 
@@ -773,7 +791,6 @@
     }
     daysEl.innerHTML = html;
 
-    // В базовом режиме клики по дням не навешиваем
     if (!BASE_MODE) {
       daysEl.querySelectorAll('.cell[data-date]').forEach(el => {
         el.addEventListener('click', () => openModal(el.dataset.date));
@@ -972,7 +989,6 @@
   syncSelectors();
   render();
 
-  // Загружаем данные с GitHub только в полном режиме
   if (!BASE_MODE) {
     pullFromGitHub();
   } else {
