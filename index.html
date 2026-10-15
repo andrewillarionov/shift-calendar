@@ -268,16 +268,16 @@
   const monthSelect = document.getElementById('monthSelect');
   const yearSelect = document.getElementById('yearSelect');
 
-  // Заполняем селекторы
+  // Заполняем селектор месяцев
   MONTHS.forEach((m, i) => {
     const o = document.createElement('option');
     o.value = i; o.textContent = m;
     monthSelect.appendChild(o);
   });
 
-  const THIS_YEAR = today.getFullYear();
-  const START_YEAR = 2020;
-  const END_YEAR = 2040;
+  // Заполняем селектор годов: 2000–2100
+  const START_YEAR = 2000;
+  const END_YEAR = 2100;
   for (let y = START_YEAR; y <= END_YEAR; y++) {
     const o = document.createElement('option');
     o.value = y; o.textContent = y;
