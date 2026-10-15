@@ -65,6 +65,7 @@
     font-family: inherit;
   }
   .topbar .burger:active { transform: scale(0.95); }
+  .topbar .burger.hidden { visibility: hidden; }
 
   .header { text-align: center; padding: 4px 0 2px; }
   .header h1 {
@@ -185,6 +186,10 @@
   }
   .cell.black .icon,
   .cell.black .time { color: #fff !important; }
+
+  /* В базовом режиме ячейки некликабельны визуально */
+  .cell.readonly { cursor: default; }
+  .cell.readonly:active { filter: none; }
 
   .cell .num { font-size: 15px; font-weight: 800; line-height: 1; margin-top: 2px; }
   .cell .icon { font-size: 18px; line-height: 1; }
@@ -429,7 +434,7 @@
 
   <div class="header">
     <h1 id="monthTitle">—</h1>
-    <div class="sub">График смен · 2 дня / 2 ночи / 2 выходных</div>
+    <div class="sub" id="subTitle">График смен · 2 дня / 2 ночи / 2 выходных</div>
   </div>
 
   <div class="selectors">
@@ -537,6 +542,10 @@
 (function () {
   'use strict';
 
+  // ===== Режим: полный или базовый =====
+  const urlParams = new URLSearchParams(location.search);
+  const BASE_MODE = urlParams.get('mode') === 'base';
+
   const OWNER = 'andrewillarionov';
   const REPO  = 'shift-calendar';
   const FILE  = 'data.json';
@@ -584,9 +593,11 @@
 
   const daysEl = document.getElementById('days');
   const titleEl = document.getElementById('monthTitle');
+  const subTitleEl = document.getElementById('subTitle');
   const monthSelect = document.getElementById('monthSelect');
   const yearSelect = document.getElementById('yearSelect');
   const statusEl = document.getElementById('status');
+  const burgerBtn = document.getElementById('burgerBtn');
 
   const modalOverlay = document.getElementById('modalOverlay');
   const modalTitle = document.getElementById('modalTitle');
@@ -604,6 +615,12 @@
   const tokenInput = document.getElementById('tokenInput');
 
   let editingDate = null;
+
+  // Если базовый режим — прячем бургер и меняем подзаголовок
+  if (BASE_MODE) {
+    burgerBtn.classList.add('hidden');
+    subTitleEl.textContent = 'График смен · 2 дня / 2 ночи / 2 выходных (просмотр)';
+  }
 
   MONTHS.forEach((m, i) => {
     const o = document.createElement('option');
@@ -725,7 +742,8 @@
     let html = '';
     for (const c of cells) {
       const base = shiftForDate(c.date);
-      const rec = data[dateKey(c.date)] || null;
+      // В базовом режиме игнорируем правки
+      const rec = BASE_MODE ? null : (data[dateKey(c.date)] || null);
 
       let type = base.type, timeStr = base.time, icon = base.icon;
       if (rec) {
@@ -737,6 +755,7 @@
       const cls = ['cell', type];
       if (c.other) cls.push('other');
       if (rec && rec.black) cls.push('black');
+      if (BASE_MODE && !c.other) cls.push('readonly');
       if (!c.other && daysBetween(today, c.date) === 0) cls.push('today');
 
       const dot = (rec && !c.other) ? '<div class="dot"></div>' : '';
@@ -754,12 +773,16 @@
     }
     daysEl.innerHTML = html;
 
-    daysEl.querySelectorAll('.cell[data-date]').forEach(el => {
-      el.addEventListener('click', () => openModal(el.dataset.date));
-    });
+    // В базовом режиме клики по дням не навешиваем
+    if (!BASE_MODE) {
+      daysEl.querySelectorAll('.cell[data-date]').forEach(el => {
+        el.addEventListener('click', () => openModal(el.dataset.date));
+      });
+    }
   }
 
   function openModal(key) {
+    if (BASE_MODE) return;
     editingDate = key;
     const [y, m, d] = key.split('-').map(Number);
     const dateObj = new Date(y, m - 1, d);
@@ -901,7 +924,8 @@
     touchStartX = null;
   }, { passive: true });
 
-  document.getElementById('burgerBtn').addEventListener('click', () => {
+  burgerBtn.addEventListener('click', () => {
+    if (BASE_MODE) return;
     tokenInput.value = token ? '••••••••••••••••' : '';
     menuOverlay.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -947,7 +971,13 @@
 
   syncSelectors();
   render();
-  pullFromGitHub();
+
+  // Загружаем данные с GitHub только в полном режиме
+  if (!BASE_MODE) {
+    pullFromGitHub();
+  } else {
+    setStatus('Режим просмотра графика');
+  }
 })();
 </script>
 </body>
