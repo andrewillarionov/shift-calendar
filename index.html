@@ -10,13 +10,10 @@
   :root {
     --day-bg: #FFF3C4;
     --day-fg: #7A5A00;
-    --day-icon: #F5B800;
     --night-bg: #D6E4FF;
     --night-fg: #1E3A8A;
-    --night-icon: #3B5BDB;
     --off-bg: #FFD9DE;
     --off-fg: #8B1F2F;
-    --off-icon: #E5484D;
     --other-bg: #F0F0F0;
     --other-fg: #BDBDBD;
     --today-ring: #111;
@@ -24,6 +21,8 @@
     --card: #FFFFFF;
     --text: #1A1A1A;
     --muted: #888;
+    --border: #E6E6E6;
+    --accent: #111;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -33,6 +32,7 @@
     background: var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    -webkit-text-size-adjust: 100%;
   }
 
   .app {
@@ -41,7 +41,6 @@
     padding: 10px 8px 24px;
   }
 
-  /* Заголовок */
   .header { text-align: center; padding: 4px 0 2px; }
   .header h1 {
     margin: 0;
@@ -55,12 +54,7 @@
     margin-top: 2px;
   }
 
-  /* Селекторы месяц/год */
-  .selectors {
-    display: flex;
-    gap: 8px;
-    margin: 12px 0 8px;
-  }
+  .selectors { display: flex; gap: 8px; margin: 12px 0 8px; }
   .selectors select {
     flex: 1;
     appearance: none;
@@ -81,9 +75,7 @@
     text-align: center;
     text-align-last: center;
   }
-  .selectors select:focus { outline: 2px solid #111; }
 
-  /* Навигация */
   .nav {
     display: flex;
     align-items: center;
@@ -105,13 +97,8 @@
   }
   .nav button:active { transform: scale(0.95); }
   .nav .arrow { flex: 1; }
-  .nav .today-btn {
-    flex: 1.4;
-    background: #111;
-    color: #fff;
-  }
+  .nav .today-btn { flex: 1.4; background: #111; color: #fff; }
 
-  /* Календарь */
   .calendar {
     background: var(--card);
     border-radius: 16px;
@@ -153,18 +140,27 @@
     overflow: hidden;
     user-select: none;
     cursor: pointer;
+    transition: filter .1s ease;
   }
+  .cell:active { filter: brightness(0.94); }
 
-  /* Базовые цвета смен */
   .cell.day    { background: var(--day-bg);   color: var(--day-fg); }
   .cell.night  { background: var(--night-bg); color: var(--night-fg); }
   .cell.off    { background: var(--off-bg);   color: var(--off-fg); }
 
-  /* Соседние месяцы — В КОНЦЕ, чтобы переопределяли */
   .cell.other {
     background: var(--other-bg) !important;
     color: var(--other-fg) !important;
+    cursor: default;
   }
+
+  /* Чёрный квадрат */
+  .cell.black {
+    background: #111 !important;
+    color: #fff !important;
+  }
+  .cell.black .icon,
+  .cell.black .time { color: #fff !important; }
 
   .cell .num {
     font-size: 15px;
@@ -172,12 +168,7 @@
     line-height: 1;
     margin-top: 2px;
   }
-
-  .cell .icon {
-    font-size: 18px;
-    line-height: 1;
-  }
-
+  .cell .icon { font-size: 18px; line-height: 1; }
   .cell .time {
     font-size: 9px;
     font-weight: 700;
@@ -186,17 +177,184 @@
     margin-bottom: 1px;
   }
 
-  .cell.today {
-    box-shadow: inset 0 0 0 2.5px var(--today-ring);
-  }
+  .cell.today { box-shadow: inset 0 0 0 2.5px var(--today-ring); }
+  .cell.black.today { box-shadow: inset 0 0 0 2.5px #fff; }
 
-  /* Уменьшение для узких экранов */
+  /* Индикатор ручной отметки */
+  .cell .dot {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #E5484D;
+  }
+  .cell.black .dot { background: #fff; }
+
   @media (max-width: 400px) {
     .cell .num { font-size: 14px; }
     .cell .icon { font-size: 16px; }
     .cell .time { font-size: 8.5px; }
     .header h1 { font-size: 22px; }
   }
+
+  /* ===== Модалка ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 100;
+    padding: 0;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: #fff;
+    width: 100%;
+    max-width: 720px;
+    border-radius: 20px 20px 0 0;
+    padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp .22s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .modal .grabber {
+    width: 40px; height: 4px;
+    background: #DDD;
+    border-radius: 2px;
+    margin: 0 auto 12px;
+  }
+
+  .modal h2 {
+    margin: 0 0 4px;
+    font-size: 20px;
+    font-weight: 800;
+  }
+  .modal .date-sub {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+  }
+
+  /* Кнопки-переключатели типа */
+  .segmented {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    background: #F2F2F2;
+    padding: 4px;
+    border-radius: 12px;
+  }
+  .segmented button {
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 10px 4px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+  }
+  .segmented button.active {
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  }
+  .segmented button[data-shift="day"].active   { background: var(--day-bg);   color: var(--day-fg); }
+  .segmented button[data-shift="night"].active { background: var(--night-bg); color: var(--night-fg); }
+  .segmented button[data-shift="off"].active   { background: var(--off-bg);   color: var(--off-fg); }
+
+  .time-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .time-row input[type="time"] {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 12px;
+    font-size: 16px;
+    font-family: inherit;
+    font-weight: 600;
+    background: #fff;
+    color: var(--text);
+  }
+  .time-row .sep { color: var(--muted); font-weight: 700; }
+
+  input[type="text"] {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 16px;
+    font-family: inherit;
+    background: #fff;
+    color: var(--text);
+  }
+  input[type="text"]:focus,
+  input[type="time"]:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #F7F7F7;
+    border-radius: 10px;
+  }
+  .checkbox-row input[type="checkbox"] {
+    width: 20px; height: 20px;
+    accent-color: #111;
+  }
+  .checkbox-row label {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .modal-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .modal-actions button {
+    border: none;
+    border-radius: 12px;
+    padding: 14px 8px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-cancel  { background: #F2F2F2; color: #333; }
+  .btn-delete  { background: #FFE5E5; color: #B71C1C; }
+  .btn-save    { background: #111; color: #fff; }
 </style>
 </head>
 <body>
@@ -226,28 +384,87 @@
   </div>
 </div>
 
+<!-- ===== Модалка ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="grabber"></div>
+    <h2 id="modalTitle">—</h2>
+    <div class="date-sub" id="modalSub">—</div>
+
+    <div class="field">
+      <label>Тип дня</label>
+      <div class="segmented" id="shiftSeg">
+        <button data-shift="auto">По графику</button>
+        <button data-shift="day">День</button>
+        <button data-shift="night">Ночь</button>
+        <button data-shift="off">Выходной</button>
+      </div>
+    </div>
+
+    <div class="field" id="timeField" style="display:none;">
+      <label>Часы работы</label>
+      <div class="time-row">
+        <input type="time" id="timeFrom">
+        <span class="sep">—</span>
+        <input type="time" id="timeTo">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Номер машины</label>
+      <input type="text" id="carInput" inputmode="numeric" maxlength="10" placeholder="напр. 123">
+    </div>
+
+    <div class="field">
+      <label>Заметка</label>
+      <input type="text" id="noteInput" maxlength="80" placeholder="необязательно">
+    </div>
+
+    <div class="field">
+      <div class="checkbox-row">
+        <input type="checkbox" id="blackCheck">
+        <label for="blackCheck">Чёрный квадрат</label>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" id="btnCancel">Отмена</button>
+      <button class="btn-delete" id="btnDelete">Сбросить</button>
+      <button class="btn-save" id="btnSave">Сохранить</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   'use strict';
 
-  // 1 ноября 2026 = 2-й выходной (В2)
-  const ANCHOR = new Date(2026, 10, 1);
-  const ANCHOR_OFFSET = 5; // 0=Д1 1=Д2 2=Н1 3=Н2 4=В1 5=В2
+  // ===== Константы =====
+  const ANCHOR = new Date(2026, 10, 1); // 1 ноября 2026
+  const ANCHOR_OFFSET = 5;              // 0=Д1 1=Д2 2=Н1 3=Н2 4=В1 5=В2
 
   const CYCLE = [
-    { type: 'day',   time: '08–20',  icon: '☀' },
-    { type: 'day',   time: '08–20',  icon: '☀' },
-    { type: 'night', time: '20–08',  icon: '☾' },
-    { type: 'night', time: '20–08',  icon: '☾' },
-    { type: 'off',   time: '',       icon: '🏠' },
-    { type: 'off',   time: '',       icon: '🏠' }
+    { type: 'day',   time: '08–20', icon: '☀' },
+    { type: 'day',   time: '08–20', icon: '☀' },
+    { type: 'night', time: '20–08', icon: '☾' },
+    { type: 'night', time: '20–08', icon: '☾' },
+    { type: 'off',   time: '',      icon: '🏠' },
+    { type: 'off',   time: '',      icon: '🏠' }
   ];
 
   const MONTHS = [
     'Январь','Февраль','Март','Апрель','Май','Июнь',
     'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'
   ];
+  const MONTHS_GEN = [
+    'января','февраля','марта','апреля','мая','июня',
+    'июля','августа','сентября','октября','ноября','декабря'
+  ];
+  const WEEKDAYS = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 
+  const STORAGE_KEY = 'shift-calendar-data-v1';
+
+  // ===== Утилиты =====
   function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
   function daysBetween(a, b) {
     return Math.round((startOfDay(b) - startOfDay(a)) / 86400000);
@@ -258,27 +475,58 @@
     const cycleIdx = ((ANCHOR_OFFSET + idx) % 6 + 6) % 6;
     return CYCLE[cycleIdx];
   }
+  function dateKey(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+  }
 
+  // ===== Хранилище =====
+  let data = {};
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) data = JSON.parse(raw) || {};
+  } catch (e) { data = {}; }
+
+  function saveData() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+
+  // ===== Состояние =====
   const today = startOfDay(new Date());
   let viewYear = today.getFullYear();
   let viewMonth = today.getMonth();
 
+  // ===== DOM =====
   const daysEl = document.getElementById('days');
   const titleEl = document.getElementById('monthTitle');
   const monthSelect = document.getElementById('monthSelect');
   const yearSelect = document.getElementById('yearSelect');
 
-  // Заполняем селектор месяцев
+  // Модалка
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalSub = document.getElementById('modalSub');
+  const shiftSeg = document.getElementById('shiftSeg');
+  const timeField = document.getElementById('timeField');
+  const timeFrom = document.getElementById('timeFrom');
+  const timeTo = document.getElementById('timeTo');
+  const carInput = document.getElementById('carInput');
+  const noteInput = document.getElementById('noteInput');
+  const blackCheck = document.getElementById('blackCheck');
+
+  let editingDate = null; // Date объекта, который редактируем
+
+  // ===== Селекторы =====
   MONTHS.forEach((m, i) => {
     const o = document.createElement('option');
     o.value = i; o.textContent = m;
     monthSelect.appendChild(o);
   });
-
-  // Заполняем селектор годов: 2000–2100
-  const START_YEAR = 2000;
-  const END_YEAR = 2100;
-  for (let y = START_YEAR; y <= END_YEAR; y++) {
+  for (let y = 2000; y <= 2100; y++) {
     const o = document.createElement('option');
     o.value = y; o.textContent = y;
     yearSelect.appendChild(o);
@@ -289,6 +537,7 @@
     yearSelect.value = viewYear;
   }
 
+  // ===== Рендер календаря =====
   function render() {
     titleEl.textContent = MONTHS[viewMonth] + ' ' + viewYear;
 
@@ -300,7 +549,6 @@
     if (firstWeekday < 0) firstWeekday = 6;
 
     const cells = [];
-
     if (firstWeekday > 0) {
       const prevLast = new Date(viewYear, viewMonth, 0).getDate();
       for (let i = firstWeekday - 1; i >= 0; i--) {
@@ -319,24 +567,159 @@
 
     let html = '';
     for (const c of cells) {
-      const info = shiftForDate(c.date);
-      const cls = ['cell', info.type];
+      const base = shiftForDate(c.date);
+      const rec = data[dateKey(c.date)] || null;
+
+      // Итоговый тип с учётом override
+      let type = base.type, timeStr = base.time, icon = base.icon;
+      if (rec) {
+        if (rec.shift === 'day')   { type = 'day';   timeStr = rec.timeFrom && rec.timeTo ? shortTime(rec.timeFrom, rec.timeTo) : '08–20'; icon = '☀'; }
+        if (rec.shift === 'night') { type = 'night'; timeStr = rec.timeFrom && rec.timeTo ? shortTime(rec.timeFrom, rec.timeTo) : '20–08'; icon = '☾'; }
+        if (rec.shift === 'off')   { type = 'off';   timeStr = ''; icon = '🏠'; }
+      }
+
+      const cls = ['cell', type];
       if (c.other) cls.push('other');
+      if (rec && rec.black) cls.push('black');
       if (!c.other && daysBetween(today, c.date) === 0) cls.push('today');
+
+      const dot = rec && !c.other ? '<div class="dot"></div>' : '';
 
       if (c.other) {
         html += `<div class="${cls.join(' ')}"><div class="num">${c.date.getDate()}</div></div>`;
       } else {
-        html += `<div class="${cls.join(' ')}">
+        html += `<div class="${cls.join(' ')}" data-date="${dateKey(c.date)}">
+          ${dot}
           <div class="num">${c.date.getDate()}</div>
-          <div class="icon">${info.icon}</div>
-          ${info.time ? `<div class="time">${info.time}</div>` : '<div class="time">&nbsp;</div>'}
+          <div class="icon">${icon}</div>
+          ${timeStr ? `<div class="time">${timeStr}</div>` : '<div class="time">&nbsp;</div>'}
         </div>`;
       }
     }
     daysEl.innerHTML = html;
+
+    // Вешаем обработчики на ячейки
+    daysEl.querySelectorAll('.cell[data-date]').forEach(el => {
+      el.addEventListener('click', () => openModal(el.dataset.date));
+    });
   }
 
+  function shortTime(from, to) {
+    // "18:00" → "18", "22:30" → "22:30"
+    const short = (t) => {
+      const [h, m] = t.split(':');
+      return (m === '00') ? h : `${h}:${m}`;
+    };
+    return `${short(from)}–${short(to)}`;
+  }
+
+  // ===== Модалка =====
+  function openModal(key) {
+    editingDate = key;
+    const [y, m, d] = key.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d);
+
+    modalTitle.textContent = `${d} ${MONTHS_GEN[m - 1]} ${y}`;
+    modalSub.textContent = WEEKDAYS[dateObj.getDay()] + ' · по графику: ' + describeBase(dateObj);
+
+    const rec = data[key] || {};
+
+    // Устанавливаем тип
+    setShiftSegment(rec.shift || 'auto');
+
+    // Часы
+    timeFrom.value = rec.timeFrom || '';
+    timeTo.value = rec.timeTo || '';
+    updateTimeVisibility(rec.shift || 'auto');
+
+    carInput.value = rec.car || '';
+    noteInput.value = rec.note || '';
+    blackCheck.checked = !!rec.black;
+
+    modalOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function describeBase(dateObj) {
+    const s = shiftForDate(dateObj);
+    if (s.type === 'day') return 'дневная';
+    if (s.type === 'night') return 'ночная';
+    return 'выходной';
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+    editingDate = null;
+  }
+
+  function setShiftSegment(val) {
+    shiftSeg.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', b.dataset.shift === val);
+    });
+    updateTimeVisibility(val);
+  }
+
+  function updateTimeVisibility(val) {
+    const show = (val === 'day' || val === 'night');
+    timeField.style.display = show ? '' : 'none';
+  }
+
+  shiftSeg.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    setShiftSegment(btn.dataset.shift);
+  });
+
+  document.getElementById('btnCancel').addEventListener('click', closeModal);
+
+  document.getElementById('btnSave').addEventListener('click', () => {
+    if (!editingDate) return;
+    const shift = shiftSeg.querySelector('button.active')?.dataset.shift || 'auto';
+
+    // Если всё по графику и нет доп. данных — удаляем запись
+    const isEmpty = (
+      shift === 'auto' &&
+      !carInput.value.trim() &&
+      !noteInput.value.trim() &&
+      !blackCheck.checked
+    );
+    if (isEmpty) {
+      delete data[editingDate];
+    } else {
+      data[editingDate] = {
+        shift: shift === 'auto' ? undefined : shift,
+        timeFrom: shift === 'day' || shift === 'night' ? (timeFrom.value || '') : '',
+        timeTo:   shift === 'day' || shift === 'night' ? (timeTo.value || '')   : '',
+        car: carInput.value.trim(),
+        note: noteInput.value.trim(),
+        black: blackCheck.checked
+      };
+      // Убираем undefined
+      Object.keys(data[editingDate]).forEach(k => {
+        if (data[editingDate][k] === undefined || data[editingDate][k] === '') {
+          if (k !== 'black') delete data[editingDate][k];
+        }
+      });
+    }
+    saveData();
+    closeModal();
+    render();
+  });
+
+  document.getElementById('btnDelete').addEventListener('click', () => {
+    if (!editingDate) return;
+    delete data[editingDate];
+    saveData();
+    closeModal();
+    render();
+  });
+
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) closeModal();
+  });
+
+  // ===== Навигация =====
   function goTo(y, m) {
     viewYear = y; viewMonth = m;
     syncSelectors();
