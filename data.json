@@ -9,6 +9,8 @@
     "black": true
   },
   "2093-02-05": {
-    "shift": "night"
+    "shift": "night",
+    "timeFrom": "20:48",
+    "timeTo": "20:48"
   }
 }
